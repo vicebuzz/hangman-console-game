@@ -22,9 +22,9 @@ class Hangman():
    ===''', '''
 +---+
 O   |
-     |
-     |
-    ===''', '''
+    |
+    |
+   ===''', '''
  +---+
  O   |
  |   |
@@ -50,7 +50,6 @@ O   |
 /|\  |
 / \  |
     ===''']
-        self.art_period = 0
         self.art_stage = 0
 
 
@@ -98,59 +97,54 @@ O   |
 
         self.current_word = self.words[random.randint(0,len(self.words))]
 
-        period_count = 0
-
         while True:
-            print(self.art[self.art_stage])
-            print(self.load_word_strings())
-            guess = input(':> ')
+            if self.tries > 0:
+                print(self.art[self.art_stage])
+                print(self.load_word_strings())
+                guess = input(':> ')
 
-            if len(guess) == 1:
-                if guess in self.current_word:
-                    self.user_gueses.append(guess)
+                if len(guess) == 1:
+                    if guess in self.current_word:
+                        self.user_gueses.append(guess)
 
-                    if self.check_user_guessed_word():
-                        user_choice = input(f'Good, see the word is {self.current_word}, would you like to continue?> ')
-                        
-                        if user_choice in ['y', 'Y', 'YES', 'yes', 'Yes', '1', 'ok', 'go', '12XU']:
-
-                            self.words_guessed += 1
-                            self.play()
-
-                        elif user_choice in ['n', 'N', 'NO', 'no', 'No', '0', 'stop']:
+                        if self.check_user_guessed_word():
+                            user_choice = input(f'Good, see the word is {self.current_word}, would you like to continue?> ')
                             
+                            if user_choice in ['y', 'Y', 'YES', 'yes', 'Yes', '1', 'ok', 'go', '12XU']:
+
+                                self.words_guessed += 1
+                                self.play()
+
+                            elif user_choice in ['n', 'N', 'NO', 'no', 'No', '0', 'stop']:
+                                
+                                print(f'Ok, you have guessed {self.words_guessed} from {self.tries - tries} tries, have a good one.')
+                                break
+                    else:
+                        tries -= 1
+                        self.art_stage += 1
+                        print(f'Nope, you have {tries} tries left')
+                else:
+                    if guess == self.current_word:
+                        choice = input('Well done, this is the word, took you long enough:(, would you like to continue?\n:>')
+
+                        if choice in ['y', 'Y', 'YES', 'yes', 'Yes', '1', 'ok', 'go', '12XU']:
+                            self.words_guessed += 1
+                            self.play(self.tries)
+
+                        elif choice in ['n', 'N', 'NO', 'no', 'No', '0', 'stop']:
                             print(f'Ok, you have guessed {self.words_guessed} from {self.tries - tries} tries, have a good one.')
                             break
-                else:
-                    tries -= 1
-                    period_count += 1
-                    if period_count == self.art_period:
+                    else:
+                        tries -= 1
                         self.art_stage += 1
-                        period_count = 0
-                    print(f'Nope, you have {tries} left')
+                        print(f'Nope, you have {tries} tries left')
             else:
-                if guess == self.current_word:
-                    choice = input('Well done, this is the word, took you long enough:(, would you like to continue?\n:>')
-
-                    if choice in ['y', 'Y', 'YES', 'yes', 'Yes', '1', 'ok', 'go', '12XU']:
-                        self.words_guessed += 1
-                        self.play(self.tries)
-
-                    elif choice in ['n', 'N', 'NO', 'no', 'No', '0', 'stop']:
-                        print(f'Ok, you have guessed {self.words_guessed} from {self.tries - tries} tries, have a good one.')
-                        break
-                else:
-                    tries -= 1
-                    period_count += 1
-                    if period_count == self.art_period:
-                        self.art_stage += 1
-                        period_count = 0
-                    print(f'Nope, you have {tries} left')
+                print(f'You have no tries left and been hanged! BTW, the word was {self.current_word}')
 
 
     def main(self):
-        self.choose_diffuculty()
-        tries_default = self.tries
+        #self.choose_diffuculty()
+        tries_default = 6
         self.play(tries_default)
         
         
