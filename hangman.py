@@ -10,10 +10,9 @@ class Hangman():
 
         self.current_word = ''
         self.user_gueses = []
-
-        self.tries = 20
         self.words_guessed = 0
 
+        self.art_stage = 0
         self.art = [  
 '''+---+
     |
@@ -50,9 +49,7 @@ O   |
 /|\  |
 / \  |
     ===''']
-        self.art_stage = 0
-
-
+        
     def load_words(self):
         try:
             with open('words.txt', 'r') as words_file:
@@ -70,82 +67,67 @@ O   |
             else:
                 output += '_ '
 
-        return output
+        return f'{output}\n'
     
     def check_user_guessed_word(self):
         
-        if ''.join(self.user_gueses) == self.current_word:
-            return True
-        return False
-    
-    def choose_diffuculty(self):
+        letters = sorted(list(set([a for a in self.current_word])))
+        user_inputs = sorted(self.user_gueses)
+        print(letters, user_inputs)
+        
+        return letters == user_inputs
 
-        diff_to_tries = {
-            '1':21,
-            '2':14,
-            '3':7,
-            '4':1
-        }
+    def main(self):
+        self.current_word = self.words[random.randint(0,len(self.words)-1)]
 
-        diffuculty = input('Please choose a diffuculty:\n1. Easy - 21 tries\n2. Medium - 14 tries\n3. Hard - 7 tries\n:> ')
-
-        if diffuculty in ['1','2','3']:
-            self.tries = diff_to_tries[diffuculty]
-            self.art_period = self.tries/7
-
-    def play(self, tries):
-
-        self.current_word = self.words[random.randint(0,len(self.words))]
+        print(self.current_word)
 
         while True:
-            if self.tries > 0:
-                print(self.art[self.art_stage])
+            if self.art_stage < 6:
+                print(f'{self.art[self.art_stage]}')
                 print(self.load_word_strings())
                 guess = input(':> ')
 
                 if len(guess) == 1:
-                    if guess in self.current_word:
+                    if guess in self.current_word and guess not in self.user_gueses:
                         self.user_gueses.append(guess)
-
                         if self.check_user_guessed_word():
+                            print(f'{self.art[self.art_stage]}')
+                            print(self.load_word_strings())
+                            self.user_gueses = []
+                            self.words_guessed += 1
+                            self.art_stage = 0
                             user_choice = input(f'Good, see the word is {self.current_word}, would you like to continue?> ')
-                            
-                            if user_choice in ['y', 'Y', 'YES', 'yes', 'Yes', '1', 'ok', 'go', '12XU']:
-
-                                self.words_guessed += 1
-                                self.play()
+                        
+                            if user_choice in ['y', 'Y', 'YES', 'yes', 'Yes', '1', 'ok', 'go', 'leego']:
+                                self.main()
 
                             elif user_choice in ['n', 'N', 'NO', 'no', 'No', '0', 'stop']:
-                                
-                                print(f'Ok, you have guessed {self.words_guessed} from {self.tries - tries} tries, have a good one.')
+                                print(f'Ok, your score is {self.words_guessed}, have a good one.\nP.S.: bet even my granny can beat those numbers:((')
                                 break
                     else:
-                        tries -= 1
                         self.art_stage += 1
-                        print(f'Nope, you have {tries} tries left')
+                        print(f'Nope')
                 else:
                     if guess == self.current_word:
-                        choice = input('Well done, this is the word, took you long enough:(, would you like to continue?\n:>')
+                        self.user_gueses = []
+                        self.words_guessed += 1
+                        self.art_stage = 0
+                        choice = input('Well done, this is the word, took you long enough:(, would you like to continue?\n:> ')
 
-                        if choice in ['y', 'Y', 'YES', 'yes', 'Yes', '1', 'ok', 'go', '12XU']:
-                            self.words_guessed += 1
-                            self.play(self.tries)
-
+                        if choice in ['y', 'Y', 'YES', 'yes', 'Yes', '1', 'ok', 'go', 'leego']:
+                            self.main()
                         elif choice in ['n', 'N', 'NO', 'no', 'No', '0', 'stop']:
-                            print(f'Ok, you have guessed {self.words_guessed} from {self.tries - tries} tries, have a good one.')
+                            print(f'Ok, your score is {self.words_guessed}, have a good one.\nP.S.: bet even my granny can beat those numbers:((')
                             break
                     else:
-                        tries -= 1
                         self.art_stage += 1
-                        print(f'Nope, you have {tries} tries left')
+                        print(f'Nope')
             else:
+                print(f'{self.art[self.art_stage]}')
+                print(self.load_word_strings())
                 print(f'You have no tries left and been hanged! BTW, the word was {self.current_word}')
-
-
-    def main(self):
-        #self.choose_diffuculty()
-        tries_default = 6
-        self.play(tries_default)
+                break
         
         
 if __name__ == '__main__':
